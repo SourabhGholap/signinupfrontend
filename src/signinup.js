@@ -5,16 +5,6 @@ import person from './Assets/person.png';
 import './signinup.css';
 
 function Signinup() {
-     
-    let intituser;
-
-     if(localStorage.getItem('users')==null){
-         intituser = [];
-     }
-     else{
-        intituser = JSON.parse(localStorage.getItem('users'));
-     }
-     const [users,setusers] = useState(intituser);
      const [action,setaction] = useState('Signup');
      const [username,setusername] = useState('');
      const [useremail,setuseremail] = useState('');
@@ -23,28 +13,44 @@ function Signinup() {
      const [errortext,seterrortext] = useState('');
      const [forgotpassword,setforgotpassword] = useState('0');
      const [otp,setotp] = useState('');
-     const [temp_otp,settemp_otp] = useState('');
      const [verified_otp,setverified_otp] = useState('0');
      const [otp_sent,setotp_sent] = useState('0');
      
-     const update_user_password = (e) => {
+     const update_user_password = async (e) => {
         e.preventDefault();
-        users.map((user)=>{
-            if(user.email === useremail){
-                user.password = userpassword;
-                console.log('password updated');
-                seterror('0');
-                seterrortext('password updated');
-                setforgotpassword('0');
+        console.log('update password');
+        const response = await fetch("http://localhost:8080/updatepassword",
+        {
+            method: 'POST',
+            body : JSON.stringify({email: useremail,password: userpassword}),
+            headers: {
+                'Content-Type': 'application/json'
             }
         })
+        console.log(response);
+        const msg = await response.json();
+        console.log(msg);
+        if(msg==='Password updated'){
+            seterror('0');
+            seterrortext('password updated');
+            setforgotpassword('0');
+        }
      }
 
-     const validate_otp = (e) => {  
+     const validate_otp = async (e) => {  
         e.preventDefault();
         console.log('otp',otp);
-        console.log('temp_otp',temp_otp);
-        if(temp_otp == otp){
+        const response = await fetch("http://localhost:8080/verifyotp",
+        {
+            method: 'POST',
+            body : JSON.stringify({otp: otp}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        const msg = await response.json();
+        console.log(msg);
+        if(msg==='OTP verified'){
             console.log('otp verified');
             seterror('0');
             seterrortext('otp verified');
@@ -58,84 +64,90 @@ function Signinup() {
         }
      }
 
-    useEffect(()=>{
-      }, [temp_otp]);
-
-    useEffect(() => {
-      }, [users]);
-
-     const forgotpasswordaction = (e) => { 
+     const forgotpasswordaction = async (e) => { 
         e.preventDefault();
-        let flag = 0;
-        users.map(async (user) => {
-            if (user.email === useremail) {
-                setotp_sent('1');
-                flag = 1;
-                const response = await fetch("http://localhost:8080/demo", {
-                method: 'POST', 
-                body : JSON.stringify({email: useremail}),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            const msg = await response.json();
-            settemp_otp(msg.otp);
+        console.log('forgot password action');
+        const response = await fetch("http://localhost:8080/forgotpassword", 
+        {
+            method: 'POST',
+            body : JSON.stringify({email: useremail}),
+            headers: {
+                'Content-Type': 'application/json'
             }
         })
-        if (flag === 0) {
-            console.log('user not found');
+        const msg = await response.json();
+        if (msg==='OTP sent to your email') {
+            setotp_sent('1');
+            seterror('0');
+            seterrortext('OTP sent to your email');
+        }
+        else{
             seterror('1');
-            seterrortext('user not found Please signup first');
+            seterrortext('Email not found. Please sign up with this email');
         }
     }
 
-     const submit = (e) => {
+     const submit = async (e) => {
         e.preventDefault();
         if(action==='Signup'){
-            let flag = 0;
-            users.map((user)=>{
-                if(user.name === username || user.email === useremail){
-                    console.log('username or email already exists');
-                    seterror('1');
-                    seterrortext('username or email already exists');
-                    flag=1;
-                }
-            })
-            if(flag===0 && username!=='' && useremail!=='' && userpassword!==''){
+            if(username!=='' && useremail!=='' && userpassword!==''){
                 const newuser= {
                 name: username,
                 email: useremail,
                 password: userpassword
                 }
-                setusers([...users,newuser]);
-                localStorage.setItem('users',JSON.stringify([...users,newuser]));
-                console.log('signup success');
-                seterror('0');
-                seterrortext('signup success');
+                const response = await fetch("http://localhost:8080/adduser", 
+                {
+                    method: 'POST', 
+                    body : JSON.stringify(newuser),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                const msg = await response.json();
+                console.log(msg);
+                if(msg==='User added')
+                {
+                  seterror('0');
+                  seterrortext('signup success');
+                }
+                else{
+                  seterror('1');
+                  seterrortext(msg);
+                }
             }
-            else if(flag===0){
+            else{
                 console.log('fill all the fields');
                 seterror('1');
                 seterrortext('fill all the fields');
             }
         }
         else{
-            let flag = 0;
-            users.map((user)=>{
-                if(user.name===username && user.password===userpassword){
-                    console.log('login success');
-                    seterror('0');
-                    seterrortext('login success');
-                    flag=1;
-                }
-                else if (user.name===username && user.password!==userpassword) {
-                    console.log('incorrect password');
-                    seterror('1');
-                    seterrortext('incorrect password');
-                    flag=1;
+            const finduser = {  
+                name: username,
+                password: userpassword
+            }
+            const response = await fetch("http://localhost:8080/finduser", 
+            {
+                method: 'POST', 
+                body : JSON.stringify(finduser),
+                headers: {
+                    'Content-Type': 'application/json'
                 }
             })
-            if(flag===0){
+            const msg = await response.json();
+            console.log(msg);
+            if(msg==='login successful'){
+                console.log('login success');
+                seterror('0');
+                seterrortext('login success');
+            }
+            else if(msg==='incorrect password'){
+                console.log('incorrect password');
+                seterror('1');
+                seterrortext('incorrect password');
+            }
+            else if(msg==='User not found'){
                 console.log('user not found');
                 seterror('1');
                 seterrortext('user not found');
