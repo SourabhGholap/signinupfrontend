@@ -35,7 +35,7 @@ async function findlistings(client,query){
 server.post('/forgotpassword',async (req,res)=>
   {
     console.log(req.body);
-    const client = new MongoClient("mongodb://localhost:27017");
+    const client = new MongoClient("mongodb+srv://sourabhgholap7:MSDhoni%407@cluster0.g5fz07a.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
     try{
       await client.connect();
       const findmail  = await client.db("employees").collection("Managers").findOne({email:req.body.email});
@@ -87,7 +87,7 @@ server.post('/verifyotp',async (req,res)=>
 
 server.post('/adduser',async (req,res)=>{
   console.log(req.body);
-  const client = new MongoClient("mongodb://localhost:27017");
+  const client = new MongoClient("mongodb+srv://sourabhgholap7:MSDhoni%407@cluster0.g5fz07a.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
   try{
     await client.connect();
     const result = await createListing(client,req.body);
@@ -99,7 +99,7 @@ server.post('/adduser',async (req,res)=>{
 
 server.post('/finduser',async (req,res)=>{
   console.log(req.body);
-  const client = new MongoClient("mongodb://localhost:27017");
+  const client = new MongoClient("mongodb+srv://sourabhgholap7:MSDhoni%407@cluster0.g5fz07a.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
   try{
     await client.connect();
     const result = await findlistings(client,req.body);
@@ -120,7 +120,7 @@ server.post('/finduser',async (req,res)=>{
 
 server.post('/updatepassword',async (req,res)=>{
   console.log(req.body);
-  const client = new MongoClient("mongodb://localhost:27017");
+  const client = new MongoClient("mongodb+srv://sourabhgholap7:MSDhoni%407@cluster0.g5fz07a.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
   try{
     await client.connect();
     const result = await client.db("employees").collection("Managers").updateOne({email:req.body.email},{$set:{password:req.body.password}});
