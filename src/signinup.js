@@ -15,11 +15,13 @@ function Signinup() {
      const [otp,setotp] = useState('');
      const [verified_otp,setverified_otp] = useState('0');
      const [otp_sent,setotp_sent] = useState('0');
+    //  let url = 'http://localhost:8080/';
+     let url = 'https://sininup-pages-backend.onrender.com/';
      
      const update_user_password = async (e) => {
         e.preventDefault();
         console.log('update password');
-        const response = await fetch("http://localhost:8080/updatepassword",
+        const response = await fetch(url + "updatepassword",
         {
             method: 'POST',
             body : JSON.stringify({email: useremail,password: userpassword}),
@@ -40,7 +42,7 @@ function Signinup() {
      const validate_otp = async (e) => {  
         e.preventDefault();
         console.log('otp',otp);
-        const response = await fetch("http://localhost:8080/verifyotp",
+        const response = await fetch(url + "verifyotp",
         {
             method: 'POST',
             body : JSON.stringify({otp: otp}),
@@ -67,7 +69,7 @@ function Signinup() {
      const forgotpasswordaction = async (e) => { 
         e.preventDefault();
         console.log('forgot password action');
-        const response = await fetch("http://localhost:8080/forgotpassword", 
+        const response = await fetch(url + "forgotpassword", 
         {
             method: 'POST',
             body : JSON.stringify({email: useremail}),
@@ -96,7 +98,7 @@ function Signinup() {
                 email: useremail,
                 password: userpassword
                 }
-                const response = await fetch("http://localhost:8080/adduser", 
+                const response = await fetch(url + "adduser", 
                 {
                     method: 'POST', 
                     body : JSON.stringify(newuser),
@@ -127,7 +129,7 @@ function Signinup() {
                 name: username,
                 password: userpassword
             }
-            const response = await fetch("http://localhost:8080/finduser", 
+            const response = await fetch(url + "finduser", 
             {
                 method: 'POST', 
                 body : JSON.stringify(finduser),
@@ -151,6 +153,10 @@ function Signinup() {
                 console.log('user not found');
                 seterror('1');
                 seterrortext('user not found');
+            }
+            else
+            {
+                seterrortext('unable to connect to mangodb');
             }
         }
      }

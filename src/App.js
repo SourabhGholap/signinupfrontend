@@ -1,6 +1,6 @@
 import './App.css';
 import Signinup from './signinup';
-import Logo from './logo';
+
 
 function App() {
   return (
